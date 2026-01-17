@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../AppContext';
 import { AdminTab, SitePost, WineProduct } from '../types';
-import { LayoutDashboard, FileText, Wine, Search, Users, Settings, Save, RotateCcw, Plus, Trash2, Edit2 } from 'lucide-react';
+import { LayoutDashboard, FileText, Wine, Search, Users, Settings, Save, RotateCcw, Plus, Trash2, Edit2, Camera } from 'lucide-react';
 
 const Admin: React.FC = () => {
   const { siteData, updateSiteData, resetToDefault } = useApp();
@@ -10,10 +10,6 @@ const Admin: React.FC = () => {
 
   const handleUpdateHero = (field: string, value: string) => {
     updateSiteData({ hero: { ...siteData.hero, [field]: value } });
-  };
-
-  const handleUpdateContact = (field: string, value: any) => {
-    updateSiteData({ contact: { ...siteData.contact, [field]: value } });
   };
 
   const addPost = () => {
@@ -138,26 +134,142 @@ const Admin: React.FC = () => {
             </div>
             <div className="grid gap-4">
               {siteData.products.map((p, idx) => (
-                <div key={p.id} className="bg-neutral-900 p-4 border border-neutral-800 flex items-center gap-4">
-                   <img src={p.image} className="w-16 h-16 object-cover bg-black" />
-                   <div className="flex-grow">
-                      <input 
-                        className="bg-transparent font-serif text-lg w-full outline-none focus:border-b border-red-900" 
-                        value={p.name}
-                        onChange={(e) => {
-                          const updated = [...siteData.products];
-                          updated[idx].name = e.target.value;
-                          updateSiteData({ products: updated });
-                        }}
-                      />
-                      <p className="text-[10px] uppercase text-neutral-500">{p.origin} • {p.vintage}</p>
+                <div key={p.id} className="bg-neutral-900 p-6 border border-neutral-800 flex flex-col md:flex-row gap-6">
+                   <div className="flex shrink-0 items-start gap-4">
+                     <div className="w-24 h-32 bg-black border border-neutral-800 overflow-hidden shadow-xl">
+                       <img src={p.image} className="w-full h-full object-cover" alt={p.name} />
+                     </div>
+                     <div className="flex flex-col gap-2">
+                        <label className="text-[10px] uppercase text-neutral-500 font-bold">Image Controls</label>
+                        <button 
+                            onClick={() => {
+                              const newUrl = window.prompt(`Enter new image URL for ${p.name}:`, p.image);
+                              if (newUrl !== null && newUrl.trim() !== "") {
+                                const updated = [...siteData.products];
+                                updated[idx].image = newUrl.trim();
+                                updateSiteData({ products: updated });
+                              }
+                            }}
+                            className="flex items-center justify-center gap-2 px-3 py-2 bg-neutral-800 hover:bg-neutral-700 text-[10px] uppercase font-bold tracking-widest text-neutral-300 rounded transition-colors"
+                        >
+                            <Camera size={14} />
+                            <span>Edit URL</span>
+                        </button>
+                        <p className="text-[8px] text-neutral-600 max-w-[100px] break-all truncate">Current: {p.image}</p>
+                     </div>
                    </div>
-                   <div className="flex items-center gap-4">
-                      <span className="font-serif text-xl">${p.price}</span>
-                      <button className="text-neutral-500 hover:text-red-500">
-                        <Trash2 size={18} onClick={() => {
-                          updateSiteData({ products: siteData.products.filter(item => item.id !== p.id) });
-                        }} />
+                   
+                   <div className="flex-grow grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      <div className="space-y-1">
+                        <label className="text-[10px] uppercase text-neutral-500 font-bold">Name</label>
+                        <input 
+                          className="w-full bg-neutral-950 border border-neutral-800 p-2 text-sm rounded outline-none focus:border-red-900 transition-colors" 
+                          value={p.name}
+                          onChange={(e) => {
+                            const updated = [...siteData.products];
+                            updated[idx].name = e.target.value;
+                            updateSiteData({ products: updated });
+                          }}
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] uppercase text-neutral-500 font-bold">Region / Origin</label>
+                        <input 
+                          className="w-full bg-neutral-950 border border-neutral-800 p-2 text-sm rounded outline-none focus:border-red-900 transition-colors" 
+                          value={p.origin}
+                          onChange={(e) => {
+                            const updated = [...siteData.products];
+                            updated[idx].origin = e.target.value;
+                            updateSiteData({ products: updated });
+                          }}
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] uppercase text-neutral-500 font-bold">Price ($)</label>
+                        <input 
+                          type="number"
+                          className="w-full bg-neutral-950 border border-neutral-800 p-2 text-sm rounded outline-none focus:border-red-900 transition-colors font-serif text-lg" 
+                          value={p.price}
+                          onChange={(e) => {
+                            const updated = [...siteData.products];
+                            updated[idx].price = Number(e.target.value);
+                            updateSiteData({ products: updated });
+                          }}
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] uppercase text-neutral-500 font-bold">Vintage</label>
+                        <input 
+                          className="w-full bg-neutral-950 border border-neutral-800 p-2 text-sm rounded outline-none focus:border-red-900 transition-colors" 
+                          value={p.vintage}
+                          onChange={(e) => {
+                            const updated = [...siteData.products];
+                            updated[idx].vintage = e.target.value;
+                            updateSiteData({ products: updated });
+                          }}
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] uppercase text-neutral-500 font-bold">Type</label>
+                        <select 
+                          className="w-full bg-neutral-950 border border-neutral-800 p-2 text-sm rounded outline-none focus:border-red-900 transition-colors appearance-none" 
+                          value={p.type}
+                          onChange={(e) => {
+                            const updated = [...siteData.products];
+                            updated[idx].type = e.target.value as any;
+                            updateSiteData({ products: updated });
+                          }}
+                        >
+                          <option value="Red">Red</option>
+                          <option value="White">White</option>
+                          <option value="Rosé">Rosé</option>
+                          <option value="Sparkling">Sparkling</option>
+                          <option value="Orange">Orange</option>
+                        </select>
+                      </div>
+                      <div className="sm:col-span-1 space-y-1">
+                        <label className="text-[10px] uppercase text-neutral-500 font-bold">Featured Status</label>
+                        <div className="flex items-center space-x-2 p-1.5 bg-neutral-950 border border-neutral-800 rounded">
+                           <button 
+                            onClick={() => {
+                              const updated = [...siteData.products];
+                              updated[idx].isFeatured = !updated[idx].isFeatured;
+                              updateSiteData({ products: updated });
+                            }}
+                            className={`flex items-center gap-2 px-3 py-1 rounded text-[10px] uppercase font-bold transition-all ${p.isFeatured ? 'bg-red-900 text-white' : 'bg-neutral-800 text-neutral-500'}`}
+                           >
+                             <Wine size={12} />
+                             {p.isFeatured ? 'Featured' : 'Standard'}
+                           </button>
+                        </div>
+                      </div>
+                      <div className="sm:col-span-3 space-y-1">
+                        <label className="text-[10px] uppercase text-neutral-500 font-bold">Notes / Description</label>
+                        <textarea 
+                          rows={2}
+                          className="w-full bg-neutral-950 border border-neutral-800 p-2 text-sm rounded outline-none focus:border-red-900 transition-colors italic resize-none" 
+                          value={p.description}
+                          onChange={(e) => {
+                            const updated = [...siteData.products];
+                            updated[idx].description = e.target.value;
+                            updateSiteData({ products: updated });
+                          }}
+                        />
+                      </div>
+                   </div>
+
+                   <div className="flex md:flex-col items-center justify-center gap-4 border-t md:border-t-0 md:border-l border-neutral-800 pt-4 md:pt-0 md:pl-6">
+                      <button 
+                        className="p-3 bg-neutral-800 text-neutral-500 hover:text-red-500 hover:bg-red-900/10 rounded-full transition-all"
+                        title="Delete Product"
+                        onClick={() => {
+                          if (window.confirm(`Are you sure you want to delete "${p.name}"? This action cannot be undone.`)) {
+                            const updated = siteData.products.filter(item => item.id !== p.id);
+                            updateSiteData({ products: updated });
+                          }
+                        }}
+                      >
+                        <Trash2 size={20} />
                       </button>
                    </div>
                 </div>
@@ -198,9 +310,15 @@ const Admin: React.FC = () => {
                          >
                            {post.published ? 'Published' : 'Draft'}
                          </button>
-                         <button className="text-neutral-500 hover:text-red-500" onClick={() => {
-                             updateSiteData({ posts: siteData.posts.filter(p => p.id !== post.id) });
-                         }}>
+                         <button 
+                           className="text-neutral-500 hover:text-red-500 p-1 transition-colors" 
+                           onClick={() => {
+                             if (window.confirm(`Delete article: "${post.title}"?`)) {
+                               const updated = siteData.posts.filter(item => item.id !== post.id);
+                               updateSiteData({ posts: updated });
+                             }
+                           }}
+                         >
                            <Trash2 size={18} />
                          </button>
                       </div>
@@ -280,8 +398,13 @@ const Admin: React.FC = () => {
                         <td className="p-4"><span className="text-green-500">Active</span></td>
                         <td className="p-4">
                           <button 
-                            className="text-neutral-500 hover:text-red-500"
-                            onClick={() => updateSiteData({ subscribers: siteData.subscribers.filter(e => e !== email) })}
+                            className="text-neutral-500 hover:text-red-500 p-1 transition-colors"
+                            onClick={() => {
+                              if (window.confirm(`Unsubscribe ${email}?`)) {
+                                const updated = siteData.subscribers.filter(e => e !== email);
+                                updateSiteData({ subscribers: updated });
+                              }
+                            }}
                           >
                             <Trash2 size={16} />
                           </button>
@@ -302,7 +425,6 @@ const Admin: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#050505] flex">
-      {/* Sidebar */}
       <aside className="w-64 bg-neutral-950 border-r border-neutral-900 p-6 flex flex-col h-screen sticky top-0">
         <div className="mb-12">
           <h1 className="text-xl font-serif tracking-widest uppercase text-red-800">Admin Panel</h1>
@@ -339,7 +461,6 @@ const Admin: React.FC = () => {
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="flex-grow p-12 overflow-y-auto">
         <header className="flex justify-between items-center mb-12">
            <h2 className="text-4xl font-serif">{activeTab}</h2>
